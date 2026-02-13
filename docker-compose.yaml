@@ -1,0 +1,31 @@
+services:
+  #PostgreSQL DB
+  finsync-db:
+    image: postgres:16-alpine
+    container_name: finsync_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin_fin
+      POSTGRES_PASSWORD: securePassword123!
+      POSTGRES_DB: finsync_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # DB Interface
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: finsync_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@finsync.com
+      PGASMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - finsync-db
+
+volumes:
+  postgres_data:

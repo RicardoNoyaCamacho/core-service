@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: core-service
+
+  #DB Config
+  datasource:
+    url: jdbc:postgresql://localhost:5432/finsync_db
+    username: admin_fin
+    password: securePassword123!
+    driver-class-name: org.postgresql.Driver
+
+  #JPA (Hibernate) Config
+  jpa:
+    hibernate:
+      ddl-auto: validate #Liquidbase craete tables, NOT Hibernate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  #Liquibase Config
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
+
+  #GraphQL Config
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
+    schema:
+      printer:
+        enabled: true
+
+  #Virtual Threads enabled
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  port: 8080
+  shutdown: graceful
