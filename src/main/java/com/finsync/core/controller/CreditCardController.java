@@ -2,6 +2,7 @@ package com.finsync.core.controller;
 
 import com.finsync.core.dto.CreateCardRequest;
 import com.finsync.core.dto.CreditCardResponse;
+import com.finsync.core.dto.UpdateCardRequest;
 import com.finsync.core.service.CreditCardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,13 @@ public class CreditCardController {
     @GetMapping
     public ResponseEntity<List<CreditCardResponse>> getMyCards() {
         return ResponseEntity.ok(creditCardService.getMyCard(HARDCODED_USER_UUID));
+    }
+
+    @PatchMapping("/{cardId}")
+    public ResponseEntity<CreditCardResponse> updateCard(
+            @PathVariable UUID cardId,
+            @Valid @RequestBody UpdateCardRequest updateCardRequest
+    ) {
+        return ResponseEntity.ok(creditCardService.updateCard(cardId, updateCardRequest));
     }
 }

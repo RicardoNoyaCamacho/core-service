@@ -2,8 +2,10 @@ package com.finsync.core.service;
 
 import com.finsync.core.dto.CreateCardRequest;
 import com.finsync.core.dto.CreditCardResponse;
+import com.finsync.core.dto.UpdateCardRequest;
 import com.finsync.core.model.CreditCard;
 import com.finsync.core.repository.CreditCardRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,22 @@ public class CreditCardService {
         return creditCardRepository.findByUserId(userId).stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    @Transactional
+    public CreditCardResponse updateCard(UUID cardId, UpdateCardRequest request) {
+        CreditCard card = creditCardRepository.findById(cardId)
+                .orElseThrow(() -> new EntityNotFoundException("Tarjeta no encontrada"));
+
+        if(request.alias() != null) card.setAlias(request.alias());
+        if(request.cutoffDay() != null) card.setCutoffDay(request.cutoffDay());
+        if(request.creditLimit() != null) card.setCreditLimit(request.creditLimit());
+
+        if(card.getCurrentBalance().compareTo(card.getCreditLimit()) > 0) {
+            throw new IllegalArgumentException("El limite nuevo no puede ser menor que el se tenía.");
+        }
+
+        return mapToResponse(creditCardRepository.save(card));
     }
 
     private CreditCardResponse mapToResponse(CreditCard card) {

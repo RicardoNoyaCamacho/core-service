@@ -41,7 +41,14 @@ public class TransactionService {
                 .build();
         if(request.type() == TransactionType.EXPENSE) {
             //Gasto, aumenta la deuda
-            card.setCurrentBalance(card.getCurrentBalance().add(request.amount()));
+            BigDecimal newBalance = card.getCurrentBalance().add(request.amount());
+
+            if(newBalance.compareTo(card.getCreditLimit()) > 0) {
+                throw new IllegalArgumentException("La transacción excede el límite de la tarjeta");
+            }
+
+            card.setCurrentBalance(newBalance);
+
         } else if(request.type() == TransactionType.PAYMENT) {
             //Pago, disminuye la deuda
             card.setCurrentBalance(card.getCurrentBalance().subtract(request.amount()));
@@ -57,6 +64,10 @@ public class TransactionService {
     public void addExistingInstallmentPlan(CreateInstallmentRequest request) {
         CreditCard card = creditCardRepository.findById(request.cardId())
                 .orElseThrow(() -> new EntityNotFoundException("Tarjeta no encontrada"));
+
+        if(request.totalAmount().compareTo(card.getCreditLimit()) > 0) {
+            throw new IllegalArgumentException("La transacción excede el límite de la tarjeta");
+        }
 
         InstallmentPlan plan = InstallmentPlan.builder()
                 .card(card)
