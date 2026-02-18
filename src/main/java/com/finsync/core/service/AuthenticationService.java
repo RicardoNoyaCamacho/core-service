@@ -48,4 +48,12 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         return new AuthenticationResponse(jwtToken);
     }
+
+    public void closeAccount(String email) {
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setIsActive(false);
+        userRepository.save(user);
+    }
 }

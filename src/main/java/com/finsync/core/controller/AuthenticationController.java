@@ -6,10 +6,8 @@ import com.finsync.core.dto.auth.RegisterRequest;
 import com.finsync.core.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -30,5 +28,11 @@ public class AuthenticationController {
             @RequestBody AuthenticationRequest request
     ) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> closeAccount(Authentication authentication) {
+        authenticationService.closeAccount(authentication.getName());
+        return ResponseEntity.accepted().build();
     }
 }
