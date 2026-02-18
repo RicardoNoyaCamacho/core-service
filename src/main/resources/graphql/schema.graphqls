@@ -1,0 +1,29 @@
+#Definicion de tipo de datos
+type CreditCard {
+    cardId: ID!
+    alias: String!
+    last4Digits: String
+    currentBalance: Float
+    creditLimit: Float
+    cutoffDay: Int
+    availableCredit: Float #Campo calculado (Limite - Deuda)
+    transactions(limit: Int): [Transaction] # Lisat anidada
+}
+
+type Transaction {
+    transactionId: ID!
+    amount: Float
+    description: String
+    type: String #EXPENSE o PAYMENT
+    transactionDate: String
+    category: String
+}
+
+#Definimos las consultas disponibles
+type Query {
+    #Obtener todas las tarjetas del usuario (Hardcodeado por ahora)
+    myCards: [CreditCard]
+
+    #Obtener detalles de una tarjeta especigica
+    cardDetails(cardId: ID!): CreditCard
+}
