@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -38,6 +39,7 @@ public class TransactionService {
                 .description(request.description())
                 .type(request.type())
                 .category(request.category())
+                .transactionDate(LocalDateTime.now())
                 .build();
         if(request.type() == TransactionType.EXPENSE) {
             //Gasto, aumenta la deuda
