@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface AccountStatementRepository extends JpaRepository<AccountStatement, UUID> {
     boolean existsByCard_CardIdAndPeriodEndDate(UUID cardId, LocalDate periodEndDate);
     List<AccountStatement> findByCard_CardIdOrderByPeriodEndDateDesc(UUID cardId);
+    List<AccountStatement> findByDueDateAndIsPaidFalse(LocalDate dueDate);
+    List<AccountStatement> findByDueDateAndIsPaidFalseAndCard_UserId(LocalDate dueDate, UUID userId);
 }

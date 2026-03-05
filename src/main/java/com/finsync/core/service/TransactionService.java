@@ -30,10 +30,12 @@ public class TransactionService {
     private final InstallmentRepository installmentRepository;
 
     @Transactional
-    public UUID createTransaction(CreateTransactionRequest request) {
+    public UUID createTransaction(UUID userId, CreateTransactionRequest request) {
 
         CreditCard card = creditCardRepository.findById(request.cardId())
                 .orElseThrow(() -> new EntityNotFoundException("Tarjeta no encontrada"));
+
+        validateCardOwnership(card, userId);
 
         Transaction transaction = Transaction.builder()
                 .card(card)
@@ -149,5 +151,17 @@ public class TransactionService {
                 plan.getOriginalPurchaseDate(),
                 plan.getIsActive()
         );
+    }
+
+    public void validateCardOwnership(UUID cardId, UUID userId) {
+        CreditCard card = creditCardRepository.findById(cardId)
+                .orElseThrow(() -> new EntityNotFoundException("Tarjeta no encontrada"));
+        validateCardOwnership(card, userId);
+    }
+
+    private void validateCardOwnership(CreditCard card, UUID userId) {
+        if (!card.getUserId().equals(userId)) {
+            throw new SecurityException("No tienes permiso para operar sobre esta tarjeta");
+        }
     }
 }
