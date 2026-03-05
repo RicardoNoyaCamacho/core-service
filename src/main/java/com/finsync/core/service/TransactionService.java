@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -90,7 +91,30 @@ public class TransactionService {
         BigDecimal remainingDebt = monthlyPayment.multiply(BigDecimal.valueOf(remainingMonths));
 
         card.setCurrentBalance(card.getCurrentBalance().add(remainingDebt));
-
         creditCardRepository.save(card);
+
+        Transaction transaction = Transaction.builder()
+                .card(card)
+                .amount(request.totalAmount()) // Mostramos el monto total de la compra original
+                .description(request.description() + " (" + request.totalInstallments() + " MSI)") // Agregamos info extra
+                .type(TransactionType.EXPENSE) // Cuenta como un Gasto
+                .category("Meses Sin Intereses")
+                .transactionDate(request.originalDate() != null ? request.originalDate().atStartOfDay() : LocalDateTime.now())
+                .status("DIFERIDO") // Opcional: Un status diferente
+                .build();
+
+        transactionRepository.save(transaction);
+    }
+
+    public List<Transaction> getTransactionsByCardId(UUID cardId) {
+        // Validamos que la tarjeta exista (opcional, pero buena práctica)
+        if (!creditCardRepository.existsById(cardId)) {
+            throw new EntityNotFoundException("Tarjeta no encontrada");
+        }
+        return transactionRepository.findByCard_CardIdOrderByTransactionDateDesc(cardId);
+    }
+
+    public List<InstallmentPlan> getActiveInstallments(UUID cardId) {
+        return installmentRepository.findByCard_CardIdAndIsActiveTrue(cardId);
     }
 }

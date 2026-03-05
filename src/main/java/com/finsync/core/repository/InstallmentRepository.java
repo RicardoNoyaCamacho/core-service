@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface InstallmentRepository extends JpaRepository<InstallmentPlan, UUID> {
     List<InstallmentPlan> findByCard_CardId(UUID cardId);
+    List<InstallmentPlan> findByCard_CardIdAndIsActiveTrue(UUID cardId);
 }

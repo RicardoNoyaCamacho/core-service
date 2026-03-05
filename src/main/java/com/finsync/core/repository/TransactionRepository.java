@@ -13,4 +13,5 @@ import java.util.UUID;
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     List<Transaction> findByCard_CardIdAndTransactionDateBetween(UUID cardId, LocalDateTime start, LocalDateTime end);
     List<Transaction> findByCard_CardId(UUID cardId, Pageable pageable);
+    List<Transaction> findByCard_CardIdOrderByTransactionDateDesc(UUID cardId);
 }

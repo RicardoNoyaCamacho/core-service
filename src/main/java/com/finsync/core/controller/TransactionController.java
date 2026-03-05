@@ -2,16 +2,16 @@ package com.finsync.core.controller;
 
 import com.finsync.core.dto.CreateInstallmentRequest;
 import com.finsync.core.dto.CreateTransactionRequest;
+import com.finsync.core.model.InstallmentPlan;
+import com.finsync.core.model.Transaction;
 import com.finsync.core.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,6 +20,16 @@ import java.util.UUID;
 public class TransactionController {
 
     private final TransactionService transactionService;
+
+    @GetMapping("/card/{cardId}")
+    public ResponseEntity<List<Transaction>> getTransactionsByCard(@PathVariable UUID cardId) {
+        return ResponseEntity.ok(transactionService.getTransactionsByCardId(cardId));
+    }
+
+    @GetMapping("/installments/card/{cardId}")
+    public ResponseEntity<List<InstallmentPlan>> getInstallments(@PathVariable UUID cardId) {
+        return ResponseEntity.ok(transactionService.getActiveInstallments(cardId));
+    }
 
     @PostMapping
     public ResponseEntity<UUID> createTransaction(@Valid @RequestBody CreateTransactionRequest request) {

@@ -60,6 +60,11 @@ public class CreditCardService {
         return mapToResponse(creditCardRepository.save(card));
     }
 
+    public CreditCard getCardById(UUID cardId) {
+        return creditCardRepository.findById(cardId)
+                .orElseThrow(() -> new EntityNotFoundException("Tarjeta no encontrada o no te pertenece"));
+    }
+
     private CreditCardResponse mapToResponse(CreditCard card) {
         return new CreditCardResponse(
                 card.getCardId(),
