@@ -6,24 +6,48 @@ type CreditCard {
     currentBalance: Float
     creditLimit: Float
     cutoffDay: Int
-    availableCredit: Float #Campo calculado (Limite - Deuda)
-    transactions(limit: Int): [Transaction] # Lisat anidada
+    availableCredit: Float           # Campo calculado (Limite - Deuda)
+    transactions(limit: Int): [Transaction]  # Lista anidada
+    installmentPlans: [InstallmentPlan]      # Planes MSI activos
 }
 
 type Transaction {
     transactionId: ID!
     amount: Float
     description: String
-    type: String #EXPENSE o PAYMENT
+    type: String        # EXPENSE o PAYMENT
     transactionDate: String
     category: String
+    status: String
+}
+
+type InstallmentPlan {
+    planId: ID!
+    description: String
+    totalAmount: Float
+    totalInstallments: Int
+    paidInstallments: Int
+    remainingInstallments: Int
+    monthlyPayment: Float
+    remainingDebt: Float
+    originalPurchaseDate: String
+    isActive: Boolean
+}
+
+type CategoryStat {
+    category: String!
+    total: Float!
+    transactionCount: Int!
 }
 
 #Definimos las consultas disponibles
 type Query {
-    #Obtener todas las tarjetas del usuario (Hardcodeado por ahora)
+    # Obtener todas las tarjetas del usuario autenticado
     myCards: [CreditCard]
 
-    #Obtener detalles de una tarjeta especigica
+    # Obtener detalles de una tarjeta específica
     cardDetails(cardId: ID!): CreditCard
+
+    # Estadísticas de gastos por categoría para el periodo actual de la tarjeta
+    categoryStats(cardId: ID!): [CategoryStat]
 }

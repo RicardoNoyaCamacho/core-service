@@ -49,7 +49,7 @@ public class InstallmentPlan {
 
     public BigDecimal getRemainingDebt() {
         if(totalInstallments == 0) return BigDecimal.ZERO;
-        BigDecimal amountPerMonth = totalAmount.divide(BigDecimal.valueOf(totalInstallments), 2, java.math.BigDecimal.ROUND_HALF_UP);
+        BigDecimal amountPerMonth = totalAmount.divide(BigDecimal.valueOf(totalInstallments), 2, java.math.RoundingMode.HALF_UP);
         int remainingMonths = totalInstallments - paidInstallments;
         return amountPerMonth.multiply(BigDecimal.valueOf(remainingMonths));
     }

@@ -3,7 +3,6 @@ package com.finsync.core.controller;
 import com.finsync.core.dto.CreateCardRequest;
 import com.finsync.core.dto.CreditCardResponse;
 import com.finsync.core.dto.UpdateCardRequest;
-import com.finsync.core.model.CreditCard;
 import com.finsync.core.model.User;
 import com.finsync.core.service.CreditCardService;
 import jakarta.validation.Valid;
@@ -47,7 +46,7 @@ public class CreditCardController {
     }
 
     @GetMapping("/{cardId}")
-    public ResponseEntity<CreditCard> getCard(@PathVariable UUID cardId) {
-        return ResponseEntity.ok(creditCardService.getCardById(cardId));
+    public ResponseEntity<CreditCardResponse> getCard(@PathVariable UUID cardId) {
+        return ResponseEntity.ok(creditCardService.getCardResponseById(cardId));
     }
 }

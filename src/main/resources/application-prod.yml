@@ -12,11 +12,12 @@ spring:
   #JPA (Hibernate) Config
   jpa:
     hibernate:
-      ddl-auto: validate #Liquidbase craete tables, NOT Hibernate
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+        format_sql: false
+    show-sql: false
 
   #Liquibase Config
   liquibase:
@@ -26,11 +27,10 @@ spring:
   #GraphQL Config
   graphql:
     graphiql:
-      enabled: true
-      path: /graphiql
+      enabled: false
     schema:
       printer:
-        enabled: true
+        enabled: false
 
   #Virtual Threads enabled
   threads:

@@ -2,7 +2,7 @@ package com.finsync.core.controller;
 
 import com.finsync.core.dto.CreateInstallmentRequest;
 import com.finsync.core.dto.CreateTransactionRequest;
-import com.finsync.core.model.InstallmentPlan;
+import com.finsync.core.dto.InstallmentPlanResponse;
 import com.finsync.core.model.Transaction;
 import com.finsync.core.service.TransactionService;
 import jakarta.validation.Valid;
@@ -27,7 +27,7 @@ public class TransactionController {
     }
 
     @GetMapping("/installments/card/{cardId}")
-    public ResponseEntity<List<InstallmentPlan>> getInstallments(@PathVariable UUID cardId) {
+    public ResponseEntity<List<InstallmentPlanResponse>> getInstallments(@PathVariable UUID cardId) {
         return ResponseEntity.ok(transactionService.getActiveInstallments(cardId));
     }
 

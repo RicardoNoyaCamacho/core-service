@@ -1,10 +1,12 @@
 package com.finsync.core.service;
 
+import com.finsync.core.dto.AccountStatementResponse;
 import com.finsync.core.model.*;
 import com.finsync.core.repository.AccountStatementRepository;
 import com.finsync.core.repository.CreditCardRepository;
 import com.finsync.core.repository.InstallmentRepository;
 import com.finsync.core.repository.TransactionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,7 @@ public class StatementService {
     @Transactional
     public void generateCutoff(UUID cardId) {
         CreditCard card = creditCardRepository.findById(cardId)
-                .orElseThrow(() -> new RuntimeException("Credit Card Not Found"));
+                .orElseThrow(() -> new EntityNotFoundException("Tarjeta no encontrada"));
 
         //Calcular fechas
         LocalDate cutoffDate = LocalDate.now();
@@ -34,11 +36,11 @@ public class StatementService {
 
         //Validar: corte hoy?
         if(accountStatementRepository.existsByCard_CardIdAndPeriodEndDate(cardId, cutoffDate)) {
-            throw new RuntimeException("Account Statement already exists");
+            throw new IllegalStateException("Ya existe un estado de cuenta para el corte de hoy");
         }
 
         //Sumar gastos del periodo
-        List<Transaction> peroiodTransactions = transactionRepository.findByCard_CardIdAndTransactionDateBetween(
+        List<Transaction> periodTransactions = transactionRepository.findByCard_CardIdAndTransactionDateBetween(
                 cardId,
                 startDate.atStartOfDay(),
                 cutoffDate.atTime(23, 59, 59)
@@ -47,7 +49,7 @@ public class StatementService {
         BigDecimal totalExpenses = BigDecimal.ZERO;
         BigDecimal totalPayments = BigDecimal.ZERO;
 
-        for(Transaction t : peroiodTransactions) {
+        for(Transaction t : periodTransactions) {
             if(t.getType() == TransactionType.EXPENSE) {
                 totalExpenses = totalExpenses.add(t.getAmount());
             } else if(t.getType() == TransactionType.PAYMENT) {
@@ -57,16 +59,16 @@ public class StatementService {
 
         BigDecimal periodBalance = totalExpenses.subtract(totalPayments);
 
-        //Sumar coutas de MSI
+        //Sumar cuotas de MSI
         List<InstallmentPlan> activePlans = installmentRepository.findByCard_CardId(cardId);
-        BigDecimal instalmmentsTotal = BigDecimal.ZERO;
+        BigDecimal installmentsTotal = BigDecimal.ZERO;
 
         for(InstallmentPlan plan : activePlans) {
             if(Boolean.TRUE.equals(plan.getIsActive())) {
                 BigDecimal monthlyInstallment = plan.getTotalAmount()
                         .divide(BigDecimal.valueOf(plan.getTotalInstallments()), 2, java.math.RoundingMode.HALF_UP);
 
-                instalmmentsTotal = instalmmentsTotal.add(monthlyInstallment);
+                installmentsTotal = installmentsTotal.add(monthlyInstallment);
 
                 //Actualizar progreso del plan
                 plan.setPaidInstallments(plan.getPaidInstallments() + 1);
@@ -79,7 +81,7 @@ public class StatementService {
         }
 
         //Calcular totales
-        BigDecimal totalPeriodDebt = periodBalance.add(instalmmentsTotal);
+        BigDecimal totalPeriodDebt = periodBalance.add(installmentsTotal);
 
         //Si el saldo es negativo tienes saldo a favor
         if(totalPeriodDebt.compareTo(BigDecimal.ZERO) < 0) {
@@ -104,5 +106,28 @@ public class StatementService {
                 .build();
 
         accountStatementRepository.save(statement);
+    }
+
+    public List<AccountStatementResponse> getStatements(UUID cardId) {
+        if (!creditCardRepository.existsById(cardId)) {
+            throw new EntityNotFoundException("Tarjeta no encontrada");
+        }
+        return accountStatementRepository.findByCard_CardIdOrderByPeriodEndDateDesc(cardId).stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    private AccountStatementResponse mapToResponse(AccountStatement statement) {
+        return new AccountStatementResponse(
+                statement.getStatementId(),
+                statement.getCard().getCardId(),
+                statement.getPeriodStartDate(),
+                statement.getPeriodEndDate(),
+                statement.getDueDate(),
+                statement.getTotalBalance(),
+                statement.getMinPayment(),
+                statement.getBonifiablePayment(),
+                statement.isPaid()
+        );
     }
 }

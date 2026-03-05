@@ -1,13 +1,12 @@
 package com.finsync.core.controller;
 
+import com.finsync.core.dto.AccountStatementResponse;
 import com.finsync.core.service.StatementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -16,6 +15,11 @@ import java.util.UUID;
 public class StatementController {
 
     private final StatementService statementService;
+
+    @GetMapping("/{cardId}")
+    public ResponseEntity<List<AccountStatementResponse>> getStatements(@PathVariable UUID cardId) {
+        return ResponseEntity.ok(statementService.getStatements(cardId));
+    }
 
     @PostMapping("/{cardId}/cutoff")
     public ResponseEntity<String> generateCutoff(@PathVariable UUID cardId) {
