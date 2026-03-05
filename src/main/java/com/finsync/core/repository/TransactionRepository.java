@@ -1,6 +1,7 @@
 package com.finsync.core.repository;
 
 import com.finsync.core.model.Transaction;
+import com.finsync.core.model.TransactionType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,4 +15,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     List<Transaction> findByCard_CardIdAndTransactionDateBetween(UUID cardId, LocalDateTime start, LocalDateTime end);
     List<Transaction> findByCard_CardId(UUID cardId, Pageable pageable);
     List<Transaction> findByCard_CardIdOrderByTransactionDateDesc(UUID cardId);
+    List<Transaction> findByCard_CardIdAndTypeAndTransactionDateBetween(UUID cardId, TransactionType type, LocalDateTime start, LocalDateTime end);
 }

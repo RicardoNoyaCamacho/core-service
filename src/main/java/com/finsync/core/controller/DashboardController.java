@@ -1,13 +1,14 @@
 package com.finsync.core.controller;
 
+import com.finsync.core.dto.CategoryStatResponse;
+import com.finsync.core.dto.InstallmentPlanResponse;
 import com.finsync.core.model.CreditCard;
 import com.finsync.core.model.Transaction;
 import com.finsync.core.model.User;
-import com.finsync.core.repository.CreditCardRepository;
-import com.finsync.core.repository.TransactionRepository;
+import com.finsync.core.service.CreditCardService;
+import com.finsync.core.service.StatisticsService;
+import com.finsync.core.service.TransactionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
@@ -22,19 +23,24 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DashboardController {
 
-    private final CreditCardRepository creditCardRepository;
-    private final TransactionRepository transactionRepository;
+    private final CreditCardService creditCardService;
+    private final TransactionService transactionService;
+    private final StatisticsService statisticsService;
 
     @QueryMapping
     public List<CreditCard> myCards(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        return creditCardRepository.findByUserId(user.getUserId());
+        return creditCardService.getCardEntitiesByUserId(user.getUserId());
     }
 
     @QueryMapping
     public CreditCard cardDetails(@Argument UUID cardId) {
-        return creditCardRepository.findById(cardId)
-                .orElseThrow(()-> new RuntimeException("Card Not Found"));
+        return creditCardService.getCardById(cardId);
+    }
+
+    @QueryMapping
+    public List<CategoryStatResponse> categoryStats(@Argument UUID cardId) {
+        return statisticsService.getCategoryStats(cardId);
     }
 
     @SchemaMapping(typeName = "CreditCard")
@@ -44,10 +50,12 @@ public class DashboardController {
 
     @SchemaMapping(typeName = "CreditCard")
     public List<Transaction> transactions(CreditCard card, @Argument int limit) {
-        return transactionRepository.findByCard_CardId(
-                card.getCardId(),
-                PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "transactionDate"))
-        );
+        return transactionService.getTransactionsByCardIdPaged(card.getCardId(), limit);
+    }
+
+    @SchemaMapping(typeName = "CreditCard")
+    public List<InstallmentPlanResponse> installmentPlans(CreditCard card) {
+        return transactionService.getActiveInstallments(card.getCardId());
     }
 
 }

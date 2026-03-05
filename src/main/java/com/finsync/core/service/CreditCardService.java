@@ -38,6 +38,10 @@ public class CreditCardService {
         return mapToResponse(saved);
     }
 
+    public List<CreditCard> getCardEntitiesByUserId(UUID userId) {
+        return creditCardRepository.findByUserId(userId);
+    }
+
     public List<CreditCardResponse> getMyCard(UUID userId) {
         return creditCardRepository.findByUserId(userId).stream()
                 .map(this::mapToResponse)
@@ -63,6 +67,10 @@ public class CreditCardService {
     public CreditCard getCardById(UUID cardId) {
         return creditCardRepository.findById(cardId)
                 .orElseThrow(() -> new EntityNotFoundException("Tarjeta no encontrada o no te pertenece"));
+    }
+
+    public CreditCardResponse getCardResponseById(UUID cardId) {
+        return mapToResponse(getCardById(cardId));
     }
 
     private CreditCardResponse mapToResponse(CreditCard card) {

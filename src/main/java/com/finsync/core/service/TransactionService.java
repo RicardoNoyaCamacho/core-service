@@ -2,6 +2,7 @@ package com.finsync.core.service;
 
 import com.finsync.core.dto.CreateInstallmentRequest;
 import com.finsync.core.dto.CreateTransactionRequest;
+import com.finsync.core.dto.InstallmentPlanResponse;
 import com.finsync.core.model.CreditCard;
 import com.finsync.core.model.InstallmentPlan;
 import com.finsync.core.model.Transaction;
@@ -95,26 +96,58 @@ public class TransactionService {
 
         Transaction transaction = Transaction.builder()
                 .card(card)
-                .amount(request.totalAmount()) // Mostramos el monto total de la compra original
-                .description(request.description() + " (" + request.totalInstallments() + " MSI)") // Agregamos info extra
-                .type(TransactionType.EXPENSE) // Cuenta como un Gasto
+                .amount(request.totalAmount())
+                .description(request.description() + " (" + request.totalInstallments() + " MSI)")
+                .type(TransactionType.EXPENSE)
                 .category("Meses Sin Intereses")
-                .transactionDate(request.originalDate() != null ? request.originalDate().atStartOfDay() : LocalDateTime.now())
-                .status("DIFERIDO") // Opcional: Un status diferente
+                .transactionDate(request.originalDate().atStartOfDay())
+                .status("DIFERIDO")
                 .build();
 
         transactionRepository.save(transaction);
     }
 
     public List<Transaction> getTransactionsByCardId(UUID cardId) {
-        // Validamos que la tarjeta exista (opcional, pero buena práctica)
         if (!creditCardRepository.existsById(cardId)) {
             throw new EntityNotFoundException("Tarjeta no encontrada");
         }
         return transactionRepository.findByCard_CardIdOrderByTransactionDateDesc(cardId);
     }
 
-    public List<InstallmentPlan> getActiveInstallments(UUID cardId) {
-        return installmentRepository.findByCard_CardIdAndIsActiveTrue(cardId);
+    public List<Transaction> getTransactionsByCardIdPaged(UUID cardId, int limit) {
+        return transactionRepository.findByCard_CardId(
+                cardId,
+                org.springframework.data.domain.PageRequest.of(0, limit,
+                        org.springframework.data.domain.Sort.by(
+                                org.springframework.data.domain.Sort.Direction.DESC, "transactionDate"))
+        );
+    }
+
+    public List<InstallmentPlanResponse> getActiveInstallments(UUID cardId) {
+        if (!creditCardRepository.existsById(cardId)) {
+            throw new EntityNotFoundException("Tarjeta no encontrada");
+        }
+        return installmentRepository.findByCard_CardIdAndIsActiveTrue(cardId).stream()
+                .map(this::mapToInstallmentResponse)
+                .toList();
+    }
+
+    private InstallmentPlanResponse mapToInstallmentResponse(InstallmentPlan plan) {
+        BigDecimal monthlyPayment = plan.getTotalAmount()
+                .divide(BigDecimal.valueOf(plan.getTotalInstallments()), 2, RoundingMode.HALF_UP);
+        int remaining = plan.getTotalInstallments() - plan.getPaidInstallments();
+        return new InstallmentPlanResponse(
+                plan.getPlanId(),
+                plan.getCard().getCardId(),
+                plan.getDescription(),
+                plan.getTotalAmount(),
+                plan.getTotalInstallments(),
+                plan.getPaidInstallments(),
+                remaining,
+                monthlyPayment,
+                plan.getRemainingDebt(),
+                plan.getOriginalPurchaseDate(),
+                plan.getIsActive()
+        );
     }
 }

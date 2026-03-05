@@ -18,6 +18,7 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "transaction_id")
     private UUID transactionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
