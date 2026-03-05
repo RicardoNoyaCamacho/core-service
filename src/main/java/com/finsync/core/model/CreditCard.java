@@ -46,6 +46,10 @@ public class CreditCard {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Column(name = "send_payment_reminders")
+    @Builder.Default
+    private Boolean sendPaymentReminders = true;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -4,11 +4,13 @@ import com.finsync.core.dto.CreateInstallmentRequest;
 import com.finsync.core.dto.CreateTransactionRequest;
 import com.finsync.core.dto.InstallmentPlanResponse;
 import com.finsync.core.model.Transaction;
+import com.finsync.core.model.User;
 import com.finsync.core.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,9 +34,11 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<UUID> createTransaction(@Valid @RequestBody CreateTransactionRequest request) {
-        UUID transactionId = transactionService.createTransaction(request);
-
+    public ResponseEntity<UUID> createTransaction(
+            Authentication authentication,
+            @Valid @RequestBody CreateTransactionRequest request) {
+        User user = (User) authentication.getPrincipal();
+        UUID transactionId = transactionService.createTransaction(user.getUserId(), request);
         return ResponseEntity.ok(transactionId);
     }
 
