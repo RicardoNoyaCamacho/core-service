@@ -1,0 +1,52 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Maven build output
+target/
+
+# Maven wrapper (not needed inside container)
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE files
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+
+# Docker files
+docker-compose*.yml
+docker-compose*.yaml
+Dockerfile*
+.dockerignore
+
+# Nginx config
+nginx.conf
+
+# Frontend (served by nginx, not needed in backend image)
+frontend/
+
+# Documentation
+*.md
+HELP.md
+
+# Logs
+*.log
+logs/
+
+# Test reports
+surefire-reports/
