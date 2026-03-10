@@ -22,6 +22,7 @@ public class NotificationSchedulerService {
     private final NotificationService notificationService;
     private final UserRepository userRepository;
     private final StatementService statementService;
+    private final PaymentReminderEmailService paymentReminderEmailService;
 
     @Scheduled(cron = "0 0 3 * * *")
     @Transactional
@@ -83,6 +84,12 @@ public class NotificationSchedulerService {
         }
 
         log.info("Verificación de recordatorios finalizada.");
+
+        try {
+            paymentReminderEmailService.processEmailReminders();
+        } catch (Exception e) {
+            log.error("Error al procesar recordatorios de pago por email: {}", e.getMessage());
+        }
     }
 
     private void sendReminderNotifications(User user, LocalDate targetDueDate) {

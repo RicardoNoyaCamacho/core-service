@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/003-create-statements-table.sql
   - include:
       file: db/changelog/004-create-notifications-tables.sql
+  - include:
+      file: db/changelog/005-email-verification.sql

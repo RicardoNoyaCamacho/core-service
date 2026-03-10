@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${subject}">Recordatorio de pago - FinSync</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0f172a;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0f172a;padding:40px 20px;">
+    <tr>
+        <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#1e293b;border-radius:12px;border:1px solid #334155;overflow:hidden;">
+                <!-- Header -->
+                <tr>
+                    <td align="center" style="padding:40px 40px 24px;">
+                        <h1 style="margin:0;font-size:28px;font-weight:700;color:#3b82f6;letter-spacing:-0.5px;">
+                            FinSync
+                        </h1>
+                        <p style="margin:8px 0 0;font-size:13px;color:#64748b;letter-spacing:1px;text-transform:uppercase;">
+                            Gestión de Tarjetas de Crédito
+                        </p>
+                    </td>
+                </tr>
+                <!-- Urgency Banner -->
+                <tr>
+                    <td style="padding:0 40px 24px;">
+                        <div th:style="'border-radius:8px;padding:16px 20px;text-align:center;background-color:' + ${urgencyBgColor} + ';'"
+                             style="border-radius:8px;padding:16px 20px;text-align:center;background-color:#34d399;">
+                            <p th:style="'margin:0;font-size:17px;font-weight:700;color:' + ${urgencyTextColor} + ';'"
+                               style="margin:0;font-size:17px;font-weight:700;color:#064e3b;">
+                                <span th:text="${urgencyEmoji}">✅</span>
+                                &nbsp;
+                                <span th:text="${urgencyLabel}">5 días restantes</span>
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+                <!-- Divider -->
+                <tr>
+                    <td style="padding:0 40px;">
+                        <div style="height:1px;background-color:#334155;"></div>
+                    </td>
+                </tr>
+                <!-- Body -->
+                <tr>
+                    <td style="padding:32px 40px 0;">
+                        <h2 style="margin:0 0 8px;font-size:20px;font-weight:600;color:#f1f5f9;">
+                            Recordatorio de pago
+                        </h2>
+                        <p style="margin:0 0 24px;font-size:15px;color:#94a3b8;line-height:1.6;">
+                            Tu tarjeta <strong th:text="${cardAlias}" style="color:#e2e8f0;">alias</strong>
+                            (<span th:text="'••••' + ${last4Digits}" style="color:#94a3b8;">••••1234</span>)
+                            tiene un pago próximo.
+                        </p>
+                        <!-- Info Cards -->
+                        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+                            <tr>
+                                <td width="48%" style="background-color:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px 20px;vertical-align:top;">
+                                    <p style="margin:0 0 6px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Monto Total</p>
+                                    <p th:text="${totalBalance}" style="margin:0;font-size:22px;font-weight:700;color:#f1f5f9;">$0.00</p>
+                                </td>
+                                <td width="4%"></td>
+                                <td width="48%" style="background-color:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px 20px;vertical-align:top;">
+                                    <p style="margin:0 0 6px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Pago Mínimo</p>
+                                    <p th:text="${minPayment}" style="margin:0;font-size:22px;font-weight:700;color:#facc15;">$0.00</p>
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- Due Date -->
+                        <div style="background-color:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px 20px;margin-bottom:28px;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <p style="margin:0 0 4px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Fecha límite de pago</p>
+                                        <p th:text="${dueDate}" style="margin:0;font-size:18px;font-weight:600;color:#f1f5f9;">01/01/2024</p>
+                                    </td>
+                                    <td align="right">
+                                        <p style="margin:0 0 4px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Días restantes</p>
+                                        <p th:text="${daysLeft}" style="margin:0;font-size:28px;font-weight:700;color:#3b82f6;">5</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- CTA Button -->
+                        <table cellpadding="0" cellspacing="0" style="margin:0 auto 32px;width:100%;">
+                            <tr>
+                                <td align="center" style="background-color:#059669;border-radius:8px;">
+                                    <a th:href="${appUrl}" href="#"
+                                       style="display:block;padding:14px 32px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;text-align:center;">
+                                        Ver en FinSync
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- Footer -->
+                <tr>
+                    <td style="padding:0 40px;">
+                        <div style="height:1px;background-color:#334155;"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" style="padding:24px 40px;">
+                        <p style="margin:0;font-size:12px;color:#475569;line-height:1.6;">
+                            Recibes este email porque tienes recordatorios activados en FinSync.<br>
+                            © 2024 FinSync · Este es un email automático, por favor no respondas.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

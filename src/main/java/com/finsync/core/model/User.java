@@ -38,6 +38,10 @@ public class User implements UserDetails {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Column(name = "email_verified")
+    @Builder.Default
+    private Boolean emailVerified = false;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
