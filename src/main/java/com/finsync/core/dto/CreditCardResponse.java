@@ -9,6 +9,7 @@ public record CreditCardResponse(
         String last4Digits,
         BigDecimal currentBalance,
         BigDecimal creditLimit,
-        Integer cutoffDay
+        Integer cutoffDay,
+        Integer daysToPay
 ) {
 }

@@ -3,9 +3,12 @@ package com.finsync.core.service;
 import com.finsync.core.dto.auth.AuthenticationRequest;
 import com.finsync.core.dto.auth.AuthenticationResponse;
 import com.finsync.core.dto.auth.RegisterRequest;
+import com.finsync.core.model.NotificationPreference;
 import com.finsync.core.model.User;
+import com.finsync.core.repository.NotificationPreferenceRepository;
 import com.finsync.core.repository.UserRepository;
 import com.finsync.core.security.JwtService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +23,9 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final NotificationPreferenceRepository notificationPreferenceRepository;
 
+    @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder()
                 .username(request.username())
@@ -30,6 +35,14 @@ public class AuthenticationService {
                 .build();
 
         userRepository.save(user);
+
+        var preference = NotificationPreference.builder()
+                .user(user)
+                .sendPaymentReminders(true)
+                .reminderDaysBefore(5)
+                .build();
+        notificationPreferenceRepository.save(preference);
+
         var jwtToken = jwtService.generateToken(user);
         return new AuthenticationResponse(jwtToken);
     }
