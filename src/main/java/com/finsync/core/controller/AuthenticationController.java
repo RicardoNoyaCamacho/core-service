@@ -3,7 +3,6 @@ package com.finsync.core.controller;
 import com.finsync.core.dto.auth.AuthenticationRequest;
 import com.finsync.core.dto.auth.AuthenticationResponse;
 import com.finsync.core.dto.auth.RegisterRequest;
-import com.finsync.core.model.User;
 import com.finsync.core.service.AuthenticationService;
 import com.finsync.core.service.EmailVerificationService;
 import lombok.RequiredArgsConstructor;
@@ -54,10 +53,4 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping("/resend-verification")
-    public ResponseEntity<String> resendVerification(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        emailVerificationService.resendVerification(user.getUserId());
-        return ResponseEntity.ok("Verification email sent");
-    }
 }
