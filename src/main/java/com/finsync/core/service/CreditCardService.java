@@ -56,6 +56,7 @@ public class CreditCardService {
         if(request.alias() != null) card.setAlias(request.alias());
         if(request.cutoffDay() != null) card.setCutoffDay(request.cutoffDay());
         if(request.creditLimit() != null) card.setCreditLimit(request.creditLimit());
+        if(request.daysToPay() != null) card.setDaysToPay(request.daysToPay());
 
         if(card.getCurrentBalance().compareTo(card.getCreditLimit()) > 0) {
             throw new IllegalArgumentException("El limite nuevo no puede ser menor que el se tenía.");
@@ -80,7 +81,8 @@ public class CreditCardService {
                 card.getLast4Digits(),
                 card.getCurrentBalance(),
                 card.getCreditLimit(),
-                card.getCutoffDay()
+                card.getCutoffDay(),
+                card.getDaysToPay()
         );
     }
 }
