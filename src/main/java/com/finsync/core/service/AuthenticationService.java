@@ -24,6 +24,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final NotificationPreferenceRepository notificationPreferenceRepository;
+    private final EmailVerificationService emailVerificationService;
 
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
@@ -32,6 +33,7 @@ public class AuthenticationService {
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .isActive(true)
+                .emailVerified(false)
                 .build();
 
         userRepository.save(user);
@@ -42,6 +44,8 @@ public class AuthenticationService {
                 .reminderDaysBefore(5)
                 .build();
         notificationPreferenceRepository.save(preference);
+
+        emailVerificationService.sendVerificationEmail(user);
 
         var jwtToken = jwtService.generateToken(user);
         return new AuthenticationResponse(jwtToken);
